@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from db import models
 from schemas.service_schema import ServiceCreate, ServiceUpdate
-
+from fastapi import HTTPException
 
 class ServiceDatabaseApi:
     def __init__(self, current_user):
@@ -26,7 +26,9 @@ class ServiceDatabaseApi:
                 "id": s.id,
                 "name": s.name,
                 "description": s.description,
+                "icon": s.icon,
                 "price": s.price,
+                "duration": s.duration,
                 "created_at": s.created_at,
             }
             for s in services
@@ -43,13 +45,14 @@ class ServiceDatabaseApi:
     def create_service(self, data: ServiceCreate):
         current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
         if current_role != "admin":
-            from fastapi import HTTPException
             raise HTTPException(status_code=403, detail="Admin role required")
 
         new_service = models.Service(
             name=data.name,
             description=data.description,
+            icon=data.icon,
             price=data.price,
+            duration=data.duration,
         )
 
         self.db.add(new_service)
@@ -60,7 +63,6 @@ class ServiceDatabaseApi:
     def update_service(self, data: ServiceUpdate):
         current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
         if current_role != "admin":
-            from fastapi import HTTPException
             raise HTTPException(status_code=403, detail="Admin role required")
 
         service = (
@@ -73,8 +75,12 @@ class ServiceDatabaseApi:
             service.name = data.name
         if data.description is not None:
             service.description = data.description
+        if data.icon is not None:
+            service.icon = data.icon
         if data.price is not None:
             service.price = data.price
+        if data.duration is not None:
+            service.duration = data.duration
 
         self.db.commit()
         self.db.refresh(service)
@@ -83,7 +89,6 @@ class ServiceDatabaseApi:
     def delete_service(self, service_id: int):
         current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
         if current_role != "admin":
-            from fastapi import HTTPException
             raise HTTPException(status_code=403, detail="Admin role required")
 
         service = (

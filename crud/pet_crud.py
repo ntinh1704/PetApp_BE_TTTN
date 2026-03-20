@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-
+from fastapi import HTTPException
 from db import models
 from schemas.pet_schema import PetCreate, PetUpdate
 
@@ -12,11 +12,19 @@ class PetDatabaseApi:
 
     def get_list_pet(self, offset: int = 0, limit: int = 10, text_search: str = None):
         # Lấy current user
-        current_uid = self.user.get("id") if isinstance(self.user, dict) else getattr(self.user, "id", None)
-        current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
+        current_uid = (
+            self.user.get("user_id")
+            if isinstance(self.user, dict)
+            else getattr(self.user, "user_id", None)
+        )
+        current_role = (
+            self.user.get("role")
+            if isinstance(self.user, dict)
+            else getattr(self.user, "role", None)
+        )
 
         query = self.db.query(models.Pet)
-        
+
         # Chỉ thấy pet của mình nếu không phải admin
         if current_role != "admin" and current_uid is not None:
             query = query.filter(models.Pet.user_id == current_uid)
@@ -45,17 +53,31 @@ class PetDatabaseApi:
         ]
         return data, total
 
-        current_uid = self.user.get("id") if isinstance(self.user, dict) else getattr(self.user, "id", None)
-        current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
-        
+    def get_pet_by_id(self, pet_id: int):
+        current_uid = (
+            self.user.get("user_id")
+            if isinstance(self.user, dict)
+            else getattr(self.user, "user_id", None)
+        )
+        current_role = (
+            self.user.get("role")
+            if isinstance(self.user, dict)
+            else getattr(self.user, "role", None)
+        )
+
         query = self.db.query(models.Pet).filter(models.Pet.id == pet_id)
         if current_role != "admin" and current_uid is not None:
             query = query.filter(models.Pet.user_id == current_uid)
         return query.first()
 
     def create_pet(self, data: PetCreate):
+        current_uid = (
+            self.user.get("user_id")
+            if isinstance(self.user, dict)
+            else getattr(self.user, "user_id", None)
+        )
         new_pet = models.Pet(
-            user_id=data.user_id,
+            user_id=current_uid,
             name=data.name,
             breed=data.breed,
             gender=data.gender,
@@ -72,16 +94,30 @@ class PetDatabaseApi:
         return new_pet
 
     def update_pet(self, data: PetUpdate):
-        from fastapi import HTTPException
+
         pet = self.db.query(models.Pet).filter(models.Pet.id == data.id).first()
         if not pet:
             return None
-            
-        current_uid = self.user.get("id") if isinstance(self.user, dict) else getattr(self.user, "id", None)
-        current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
-        
-        if current_role != "admin" and current_uid is not None and pet.user_id != current_uid:
-            raise HTTPException(status_code=403, detail="Not authorized to update this pet")
+
+        current_uid = (
+            self.user.get("user_id")
+            if isinstance(self.user, dict)
+            else getattr(self.user, "user_id", None)
+        )
+        current_role = (
+            self.user.get("role")
+            if isinstance(self.user, dict)
+            else getattr(self.user, "role", None)
+        )
+
+        if (
+            current_role != "admin"
+            and current_uid is not None
+            and pet.user_id != current_uid
+        ):
+            raise HTTPException(
+                status_code=403, detail="Not authorized to update this pet"
+            )
 
         if data.name is not None:
             pet.name = data.name
@@ -105,16 +141,29 @@ class PetDatabaseApi:
         return pet
 
     def delete_pet(self, pet_id: int):
-        from fastapi import HTTPException
         pet = self.db.query(models.Pet).filter(models.Pet.id == pet_id).first()
         if not pet:
             return None
-            
-        current_uid = self.user.get("id") if isinstance(self.user, dict) else getattr(self.user, "id", None)
-        current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
-        
-        if current_role != "admin" and current_uid is not None and pet.user_id != current_uid:
-            raise HTTPException(status_code=403, detail="Not authorized to delete this pet")
+
+        current_uid = (
+            self.user.get("user_id")
+            if isinstance(self.user, dict)
+            else getattr(self.user, "user_id", None)
+        )
+        current_role = (
+            self.user.get("role")
+            if isinstance(self.user, dict)
+            else getattr(self.user, "role", None)
+        )
+
+        if (
+            current_role != "admin"
+            and current_uid is not None
+            and pet.user_id != current_uid
+        ):
+            raise HTTPException(
+                status_code=403, detail="Not authorized to delete this pet"
+            )
 
         self.db.delete(pet)
         self.db.commit()

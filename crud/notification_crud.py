@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-
+from fastapi import HTTPException
 from db import models
 from schemas.notification_schema import NotificationCreate, NotificationUpdate
 
@@ -68,7 +68,6 @@ class NotificationDatabaseApi:
         current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
         
         if current_role != "admin" and current_uid is not None and notification.user_id != current_uid:
-            from fastapi import HTTPException
             raise HTTPException(status_code=403, detail="Not authorized to update this notification")
 
         if data.title is not None:
@@ -91,7 +90,7 @@ class NotificationDatabaseApi:
         current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
         
         if current_role != "admin" and current_uid is not None and notification.user_id != current_uid:
-            from fastapi import HTTPException
+
             raise HTTPException(status_code=403, detail="Not authorized to delete this notification")
 
         self.db.delete(notification)

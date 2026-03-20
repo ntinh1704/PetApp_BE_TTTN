@@ -22,7 +22,6 @@ class PetBase(BaseModel):
 
 
 class PetCreate(BaseModel):
-    user_id: int
     name: str
     breed: Optional[str] = None
     gender: Optional[str] = None

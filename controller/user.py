@@ -19,7 +19,7 @@ def login_user(data: LoginRequest, db: Session = Depends(get_db)) -> LoginRespon
     access_token = create_access_token(token_data)
     refresh_token = create_refresh_token(token_data)
 
-    return LoginResponse(access_token=access_token, refresh_token=refresh_token)
+    return LoginResponse(access_token=access_token, refresh_token=refresh_token, role=user.role)
 
 
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -63,8 +63,13 @@ def update_user(data: UserUpdate, db: Session = Depends(get_db), current_user=No
     if not user_obj:
         raise HTTPException(status_code=404, detail="User not found")
         
-    current_uid = current_user.get("id") if isinstance(current_user, dict) else getattr(current_user, "id", None)
-    current_role = current_user.get("role") if isinstance(current_user, dict) else getattr(current_user, "role", None)
+    if isinstance(current_user, tuple) and len(current_user) == 3:
+        _, token_data, _ = current_user
+        current_uid = token_data.get("user_id")
+        current_role = token_data.get("role")
+    else:
+        current_uid = current_user.get("id") if isinstance(current_user, dict) else getattr(current_user, "id", None)
+        current_role = current_user.get("role") if isinstance(current_user, dict) else getattr(current_user, "role", None)
     
     if current_role != "admin" and str(current_uid) != str(user_obj.id):
         raise HTTPException(status_code=403, detail="Not authorized to update this user")
@@ -103,8 +108,13 @@ def delete_user(user_id: int, db: Session = Depends(get_db), current_user=None):
     if not user_obj:
         raise HTTPException(status_code=404, detail="User not found")
         
-    current_uid = current_user.get("id") if isinstance(current_user, dict) else getattr(current_user, "id", None)
-    current_role = current_user.get("role") if isinstance(current_user, dict) else getattr(current_user, "role", None)
+    if isinstance(current_user, tuple) and len(current_user) == 3:
+        _, token_data, _ = current_user
+        current_uid = token_data.get("user_id")
+        current_role = token_data.get("role")
+    else:
+        current_uid = current_user.get("id") if isinstance(current_user, dict) else getattr(current_user, "id", None)
+        current_role = current_user.get("role") if isinstance(current_user, dict) else getattr(current_user, "role", None)
     
     if current_role != "admin" and str(current_uid) != str(user_obj.id):
         raise HTTPException(status_code=403, detail="Not authorized to delete this user")

@@ -51,8 +51,7 @@ def get_current_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return (db, {"user_id": user.id, "username": user.username}, token)
-
+    return (db, {"user_id": user.id, "username": user.username, "role": user.role}, token)
 
 def get_offset_limit(page_size: int = 10, page: int = 0):
     if page_size <= 0:
