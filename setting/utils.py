@@ -1,4 +1,5 @@
 from typing import List, Any, Dict
+from setting.config import settings
 from fastapi import Query
 from typing import Tuple
 from fastapi import Depends, HTTPException, Request, status
@@ -12,7 +13,7 @@ from db.models import User
 
 JWT_SECRET = "mysecretkey"
 JWT_ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 1440
 REFRESH_TOKEN_EXPIRE_MINUTES = 1440
 
 security = HTTPBearer()
@@ -51,7 +52,7 @@ def get_current_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return (db, {"user_id": user.id, "username": user.username, "role": user.role}, token)
+    return (db, {"user_id": user.id, "email": user.email, "role": user.role}, token)
 
 def get_offset_limit(page_size: int = 10, page: int = 0):
     if page_size <= 0:
@@ -77,3 +78,24 @@ def get_pages_records(data, offset_limit):
         "has_next": offset + len(records) < total,
         "data": records,
     }
+
+
+def send_reset_password_email(email: str, otp: str):
+    # Code thật dùng SMTP:
+    import smtplib
+    from email.message import EmailMessage
+    
+    msg = EmailMessage()
+    msg["Subject"] = "Thiết lập lại mật khẩu - PetApp"
+    msg["From"] = f"{settings.MAIL_FROM_NAME} <{settings.MAIL_USERNAME}>"
+    msg["To"] = email
+    msg.set_content(f"Mã OTP để đặt lại mật khẩu của bạn là: {otp}\nMã này có hiệu lực trong 10 phút.")
+    
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(settings.MAIL_USERNAME, settings.MAIL_PASSWORD)
+            server.send_message(msg)
+        return True
+    except Exception as e:
+        print("Error sending email:", e)
+        return False

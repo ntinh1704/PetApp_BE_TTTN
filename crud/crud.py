@@ -24,7 +24,7 @@ class DatabaseApi:
     ):
         data = self.db.query(models.User)
         if text_search is not None:
-            data = data.filter(models.User.username.ilike(f"%{text_search.lower()}%"))
+            data = data.filter(models.User.email.ilike(f"%{text_search.lower()}%"))
         total = data.count()
         if offset != None and limit != None:
             data = data.offset(offset).limit(limit)
@@ -32,8 +32,16 @@ class DatabaseApi:
         rc = [
             {
                 "id": str(record.id),
-                "username": record.username,
                 "role": record.role,
+                "email": record.email,
+                "name": record.name,
+                "gender": record.gender,
+                "dob": record.dob,
+                "phone": record.phone,
+                "address": record.address,
+                "avatar": record.avatar,
+                "is_active": getattr(record, "is_active", True),
+                "created_at": record.created_at,
             }
             for record in data
         ]
@@ -44,7 +52,7 @@ class DatabaseApi:
 
     def create_user(self, data: user_schema.UserCreate):
         new_user = models.User(
-            username=data.username,
+            email=data.email,
             password="",  # set later
             role=data.role or "user",
         )
@@ -59,8 +67,8 @@ class DatabaseApi:
         if not user:
             return None
 
-        if data.username is not None:
-            user.username = data.username
+        if data.email is not None:
+            user.email = data.email
         if data.password is not None:
             user.set_password(data.password)
         if data.role is not None:

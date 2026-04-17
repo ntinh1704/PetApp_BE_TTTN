@@ -47,3 +47,17 @@ def delete_notification(notification_id: int, current_user=Depends(get_current_u
     if not deleted:
         raise HTTPException(status_code=404, detail="Notification not found")
     return {"detail": "Notification deleted successfully"}
+
+
+def get_unread_count(role: str = None, user_id: int = None, current_user=Depends(get_current_user)):
+    db_api = notification_crud.NotificationDatabaseApi(current_user)
+    unread = db_api.count_unread(user_id=user_id)
+    return {"unread": unread}
+
+
+def mark_notification_read(notification_id: int, current_user=Depends(get_current_user)):
+    db_api = notification_crud.NotificationDatabaseApi(current_user)
+    updated = db_api.mark_read(notification_id)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    return updated

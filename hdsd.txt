@@ -3,3 +3,4 @@ tạo môi trường: python -m venv venv
 vào môi trường: venv\Scripts\activate
 cài đặt thư viện: python -m pip install -r requirements.txt
 chạy be: python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+

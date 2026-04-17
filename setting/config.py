@@ -6,6 +6,11 @@ load_dotenv()
 class Settings:
     APP_NAME: str = os.getenv("APP_NAME", "FastAPI Core PostgreSQL Example")
     APP_DEBUG: bool = os.getenv("APP_DEBUG", "False").lower() == "true"
+    GOOGLE_API_KEY: str = os.getenv("GOOGLE_API_KEY", "")
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    MAIL_USERNAME: str = os.getenv("MAIL_USERNAME", "")
+    MAIL_PASSWORD: str = os.getenv("MAIL_PASSWORD", "")
+    MAIL_FROM_NAME: str = os.getenv("MAIL_FROM_NAME", "Admin Coco Pet")
 
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "postgres")
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "")

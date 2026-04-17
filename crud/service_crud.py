@@ -11,7 +11,7 @@ class ServiceDatabaseApi:
         self.user = token_data
 
     def get_list_service(
-        self, offset: int = 0, limit: int = 10, text_search: str = None
+        self, offset: int = 0, limit: int | None = 10, text_search: str = None
     ):
         query = self.db.query(models.Service)
 
@@ -19,7 +19,10 @@ class ServiceDatabaseApi:
             query = query.filter(models.Service.name.ilike(f"%{text_search}%"))
 
         total = query.count()
-        services = query.offset(offset).limit(limit).all()
+        if limit is None:
+            services = query.all()
+        else:
+            services = query.offset(offset).limit(limit).all()
 
         data = [
             {
@@ -29,6 +32,7 @@ class ServiceDatabaseApi:
                 "icon": s.icon,
                 "price": s.price,
                 "duration": s.duration,
+                "images": [img.image_url for img in (s.images or [])],
                 "created_at": s.created_at,
             }
             for s in services
@@ -56,6 +60,14 @@ class ServiceDatabaseApi:
         )
 
         self.db.add(new_service)
+        self.db.flush()
+
+        # Handle images (max 5)
+        if data.images:
+            for url in data.images[:5]:
+                img = models.ServiceImage(service_id=new_service.id, image_url=url)
+                self.db.add(img)
+
         self.db.commit()
         self.db.refresh(new_service)
         return new_service
@@ -81,6 +93,17 @@ class ServiceDatabaseApi:
             service.price = data.price
         if data.duration is not None:
             service.duration = data.duration
+
+        # Handle images update (max 5)
+        if data.images is not None:
+            # Delete old images
+            self.db.query(models.ServiceImage).filter(
+                models.ServiceImage.service_id == service.id
+            ).delete()
+            # Add new images
+            for url in data.images[:5]:
+                img = models.ServiceImage(service_id=service.id, image_url=url)
+                self.db.add(img)
 
         self.db.commit()
         self.db.refresh(service)

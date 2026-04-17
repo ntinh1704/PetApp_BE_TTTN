@@ -1,0 +1,54 @@
+import os
+from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+def prepare_dummy_data():
+    file_path = "knowledge.txt"
+    if not os.path.exists(file_path):
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write("""Phòng khám thú y Coco Pet cung cấp các dịch vụ chuyên nghiệp dành cho chó mèo:
+1. Tư vấn sức khỏe tổng quát. Giá niêm yết: 100,000 VNĐ.
+2. Tiêm phòng vắc xin 7 bệnh cho chó. Giá niêm yết: 250,000 VNĐ/mũi.
+3. Tiêm phòng vắc xin Dại (Rabies). Giá niêm yết: 50,000 VNĐ/mũi.
+4. Dịch vụ Spa tắm và cắt tỉa lông chuyên nghiệp. Giá niêm yết: 200,000 VNĐ (áp dụng chung tất cả kích cỡ).
+5. Triệt sản mèo (đực/cái). Giá niêm yết: 350,000 VNĐ.
+6. Triệt sản chó (đực/cái). Giá niêm yết: 600,000 VNĐ.
+
+Thời gian làm việc: Từ 6:00 sáng đến 10:00 tối (22:00) tất cả các ngày trong tuần (Thứ Hai đến Chủ Nhật).
+Khách hàng có thể đặt lịch trước thông qua ứng dụng Coco Pet để được ưu tiên phục vụ.
+
+KIẾN THỨC Y KHOA THÚ Y:
+- Bệnh Dại (Rabies): Dấu hiệu nhận biết gồm thay đổi hành vi đột ngột (hung dữ hoặc quá hiền lành), sợ nước, sợ ánh sáng, chảy nhiều nước dãi, sùi bọt mép, liệt cơ hàm dẫn đến không ăn uống được. Bệnh dại không có thuốc chữa, cần tiêm phòng định kỳ hàng năm.
+- Bệnh Care (Distemper): Triệu chứng ban đầu là sốt cao, chảy dịch mũi/mắt màu xanh hoặc vàng, ho, nôn mửa, tiêu chảy, da lòng bàn chân dày lên (nứt nẻ), run giật thần kinh.
+- Bệnh Parvo: Gây viêm ruột nặng, triệu chứng điển hình là nôn mửa liên tục, tiêu chảy nặng mùi tanh đặc trưng, phân có lẫn máu, mất nước nhanh chóng và gây tử vong cao ở chó con.
+- Viêm da (Dermatitis): Thú cưng thường xuyên gãi, liếm lông, rụng lông thành mảng, da mẩn đỏ, nổi hạt hoặc đóng vảy, có mùi hôi lạ trên da.
+- Bệnh Hạ bàn: Chân yếu, đi đứng khó khăn, phần cổ chân có xu hướng gập xuống chạm đất khi đứng. Nguyên nhân thường do thiếu canxi hoặc chăm sóc dinh dưỡng chưa đúng cách.
+- Chế độ dinh dưỡng:
+    + Chó: Cần ưu tiên protein từ thịt, bổ sung xơ từ rau củ. Tuyệt đối TRÁNH cho chó ăn socola, hành tây, nho, tỏi và thực phẩm quá mặn/cay.
+    + Mèo: Là động vật ăn thịt bắt buộc, cần được bổ sung vi chất Taurine để bảo vệ mắt và tim mạch. Nên cho mèo ăn thức ăn giàu đạm và kiểm soát lượng tinh bột.
+""")
+
+def ingest():
+    prepare_dummy_data()
+    print("Loading data from knowledge.txt...")
+    loader = TextLoader("knowledge.txt", encoding="utf-8")
+    documents = loader.load()
+    
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=50)
+    texts = text_splitter.split_documents(documents)
+    
+    print(f"Broke down into {len(texts)} chunks.")
+    print("Initializing local embeddings model (all-MiniLM-L6-v2)...")
+    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    
+    print("Creating FAISS Vector Database...")
+    db = FAISS.from_documents(texts, embeddings)
+    
+    print("Saving Vector Database to local folder 'faiss_index'...")
+    db.save_local("faiss_index")
+    print("Done! Model is ready and AI's knowledge base has been created.")
+
+if __name__ == "__main__":
+    ingest()

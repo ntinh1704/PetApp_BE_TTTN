@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from crud import service_crud
@@ -18,10 +18,16 @@ def create_service(data: ServiceCreate, current_user=Depends(get_current_user)):
 
 def get_list_service(
     text_search: str = None,
+    all: bool = Query(False, description="Return all services without pagination"),
     current_user=Depends(get_current_user),
     offset_limit=Depends(get_offset_limit),
 ):
     db_api = service_crud.ServiceDatabaseApi(current_user)
+
+    if all:
+        data, total = db_api.get_list_service(offset=0, limit=None, text_search=text_search)
+        return data
+
     offset, limit = offset_limit
     data, total = db_api.get_list_service(offset, limit, text_search)
     return get_pages_records((data, total), offset_limit)

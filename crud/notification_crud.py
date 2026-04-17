@@ -10,19 +10,30 @@ class NotificationDatabaseApi:
         self.db: Session = db
         self.user = token_data
 
+    def _current_uid(self):
+        if isinstance(self.user, dict):
+            return self.user.get("id") or self.user.get("user_id")
+        return getattr(self.user, "id", None) or getattr(self.user, "user_id", None)
+
     def get_list_notification(self, offset: int = 0, limit: int = 10, text_search: str = None):
-        current_uid = self.user.get("id") if isinstance(self.user, dict) else getattr(self.user, "id", None)
-        current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
+        current_uid = self._current_uid()
 
         query = self.db.query(models.Notification)
-        if current_role != "admin" and current_uid is not None:
+        if current_uid is not None:
             query = query.filter(models.Notification.user_id == current_uid)
 
         if text_search:
             query = query.filter(models.Notification.message.ilike(f"%{text_search}%"))
 
         total = query.count()
-        notifications = query.offset(offset).limit(limit).all()
+        
+        # Order by newest first
+        query = query.order_by(models.Notification.created_at.desc(), models.Notification.id.desc())
+        
+        if limit is None:
+            notifications = query.all()
+        else:
+            notifications = query.offset(offset).limit(limit).all()
 
         data = [
             {
@@ -38,11 +49,10 @@ class NotificationDatabaseApi:
         return data, total
 
     def get_notification_by_id(self, notification_id: int):
-        current_uid = self.user.get("id") if isinstance(self.user, dict) else getattr(self.user, "id", None)
-        current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
-        
+        current_uid = self._current_uid()
+
         query = self.db.query(models.Notification).filter(models.Notification.id == notification_id)
-        if current_role != "admin" and current_uid is not None:
+        if current_uid is not None:
             query = query.filter(models.Notification.user_id == current_uid)
         return query.first()
 
@@ -60,14 +70,13 @@ class NotificationDatabaseApi:
         return new_notification
 
     def update_notification(self, data: NotificationUpdate):
+        current_uid = self._current_uid()
+
         notification = self.db.query(models.Notification).filter(models.Notification.id == data.id).first()
         if not notification:
             return None
-            
-        current_uid = self.user.get("id") if isinstance(self.user, dict) else getattr(self.user, "id", None)
-        current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
-        
-        if current_role != "admin" and current_uid is not None and notification.user_id != current_uid:
+
+        if current_uid is not None and notification.user_id != current_uid:
             raise HTTPException(status_code=403, detail="Not authorized to update this notification")
 
         if data.title is not None:
@@ -82,17 +91,42 @@ class NotificationDatabaseApi:
         return notification
 
     def delete_notification(self, notification_id: int):
+        current_uid = self._current_uid()
+
         notification = self.db.query(models.Notification).filter(models.Notification.id == notification_id).first()
         if not notification:
             return None
-            
-        current_uid = self.user.get("id") if isinstance(self.user, dict) else getattr(self.user, "id", None)
-        current_role = self.user.get("role") if isinstance(self.user, dict) else getattr(self.user, "role", None)
-        
-        if current_role != "admin" and current_uid is not None and notification.user_id != current_uid:
 
+        if current_uid is not None and notification.user_id != current_uid:
             raise HTTPException(status_code=403, detail="Not authorized to delete this notification")
 
         self.db.delete(notification)
         self.db.commit()
+        return notification
+
+    def count_unread(self, user_id: int | None = None):
+        query = self.db.query(models.Notification).filter(models.Notification.is_read == False)
+
+        current_uid = self._current_uid()
+        target_user_id = user_id if user_id is not None else current_uid
+
+        if target_user_id is None:
+            return 0
+
+        query = query.filter(models.Notification.user_id == target_user_id)
+        return query.count()
+
+    def mark_read(self, notification_id: int):
+        current_uid = self._current_uid()
+
+        notification = self.db.query(models.Notification).filter(models.Notification.id == notification_id).first()
+        if not notification:
+            return None
+
+        if current_uid is not None and notification.user_id != current_uid:
+            raise HTTPException(status_code=403, detail="Not authorized to update this notification")
+
+        notification.is_read = True
+        self.db.commit()
+        self.db.refresh(notification)
         return notification

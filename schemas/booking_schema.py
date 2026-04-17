@@ -10,9 +10,12 @@ class BookingBase(BaseModel):
     pet_id: int
     booking_date: Optional[date] = None
     booking_time: Optional[time] = None
+    booking_end_time: Optional[time] = None
     status: Optional[str] = None
     note: Optional[str] = None
+    cancel_reason: Optional[str] = None
     total_price: Optional[float] = None
+    payment_method: Optional[str] = None
     created_at: Optional[datetime] = None
 
     class Config:
@@ -20,7 +23,6 @@ class BookingBase(BaseModel):
 
 
 class BookingCreate(BaseModel):
-    user_id: int
     pet_id: int
     service_ids: List[int]
     booking_date: Optional[date] = None
@@ -28,6 +30,8 @@ class BookingCreate(BaseModel):
     status: Optional[str] = None
     note: Optional[str] = None
     total_price: Optional[float] = None
+    payment_method: Optional[str] = None
+    booking_end_time: Optional[time] = None
 
 
 class BookingUpdate(BaseModel):
@@ -37,4 +41,6 @@ class BookingUpdate(BaseModel):
     booking_time: Optional[time] = None
     status: Optional[str] = None
     note: Optional[str] = None
+    cancel_reason: Optional[str] = None
     total_price: Optional[float] = None
+    payment_method: Optional[str] = None

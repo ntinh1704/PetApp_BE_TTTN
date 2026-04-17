@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from crud import booking_crud
@@ -18,12 +18,19 @@ def create_booking(data: BookingCreate, current_user=Depends(get_current_user)):
 
 def get_list_booking(
     text_search: str = None,
+    booking_date: str = None,
+    all: bool = Query(False, description="Return all bookings without pagination"),
     current_user=Depends(get_current_user),
     offset_limit=Depends(get_offset_limit),
 ):
     db_api = booking_crud.BookingDatabaseApi(current_user)
+
+    if all:
+        data, total = db_api.get_list_booking(offset=0, limit=None, text_search=text_search, booking_date=booking_date)
+        return data
+
     offset, limit = offset_limit
-    data, total = db_api.get_list_booking(offset, limit, text_search)
+    data, total = db_api.get_list_booking(offset, limit, text_search, booking_date=booking_date)
     return get_pages_records((data, total), offset_limit)
 
 

@@ -15,7 +15,7 @@ def get_list_booking(
     return data
 
 
-@router.get("/{booking_id}", response_model=BookingBase)
+@router.get("/{booking_id}")
 def get_booking_by_id(
     booking_id: int,
     _current_user=Depends(get_current_user),

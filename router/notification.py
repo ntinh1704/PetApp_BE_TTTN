@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends
 
 from controller import notification
-from schemas.notification_schema import NotificationBase, NotificationCreate, NotificationUpdate
+from schemas.notification_schema import (
+    NotificationBase,
+    NotificationCreate,
+    NotificationUpdate,
+)
 from setting.utils import get_current_user
 
 router = APIRouter(prefix="/notifications", tags=["Notifications"])
@@ -13,6 +17,15 @@ def get_list_notification(
     # _current_user=Depends(get_current_user),
 ):
     return data
+
+
+@router.get("/unread-count")
+def get_unread_count(
+    role: str = None,
+    user_id: int = None,
+    _current_user=Depends(get_current_user),
+):
+    return notification.get_unread_count(role=role, user_id=user_id, current_user=_current_user)
 
 
 @router.get("/{notification_id}", response_model=NotificationBase)
@@ -37,6 +50,14 @@ def update_notification(
     _current_user=Depends(get_current_user),
 ):
     return notification.update_notification(data, _current_user)
+
+
+@router.patch("/{notification_id}/read", response_model=NotificationBase)
+def mark_notification_read(
+    notification_id: int,
+    _current_user=Depends(get_current_user),
+):
+    return notification.mark_notification_read(notification_id, _current_user)
 
 
 @router.delete("/")

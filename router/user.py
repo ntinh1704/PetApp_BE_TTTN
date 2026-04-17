@@ -10,6 +10,9 @@ from schemas.user_schema import (
     UserCreate,
     UserResponse,
     UserUpdate,
+    ForgotPasswordRequest,
+    VerifyOTPRequest,
+    ResetPasswordRequest
 )
 from setting.utils import get_current_user
 from typing import List
@@ -25,6 +28,11 @@ def get_list_user(
     return data
 
 
+@router.post("/login", response_model=LoginResponse)
+def login(data: LoginRequest, db: Session = Depends(get_db)):
+    return user.login_user(data, db)
+
+
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user_by_id(
     user_id: int,
@@ -32,11 +40,6 @@ def get_user_by_id(
     _current_user=Depends(get_current_user),
 ):
     return user.get_user_by_id(user_id, db)
-
-
-@router.post("/login", response_model=LoginResponse)
-def login(data: LoginRequest, db: Session = Depends(get_db)):
-    return user.login_user(data, db)
 
 
 @router.post("/create", response_model=UserResponse)
@@ -60,3 +63,18 @@ def delete_user(
     _current_user=Depends(get_current_user),
 ):
     return user.delete_user(user_id, db, _current_user)
+
+
+@router.post("/forgot-password")
+def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    return user.forgot_password_logic(data, db)
+
+
+@router.post("/verify-otp")
+def verify_otp(data: VerifyOTPRequest, db: Session = Depends(get_db)):
+    return user.verify_otp_logic(data, db)
+
+
+@router.post("/reset-password")
+def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
+    return user.reset_password_logic(data, db)

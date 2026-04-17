@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# Environment variables
+.env
+
+# Executables
+ngrok.exe
+cloudflared.exe
+*.exe
+
+# Storage/Data
+uploads/
+faiss_index/
+
+# IDEs
+.vscode/
+.idea/

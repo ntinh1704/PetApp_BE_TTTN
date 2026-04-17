@@ -28,3 +28,7 @@ class NotificationUpdate(BaseModel):
     title: Optional[str] = None
     message: Optional[str] = None
     is_read: Optional[bool] = None
+
+
+class NotificationMarkRead(BaseModel):
+    is_read: bool = True

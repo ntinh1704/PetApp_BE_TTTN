@@ -2,9 +2,26 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from db import models
 from schemas.pet_schema import PetCreate, PetUpdate
+from pathlib import Path
+from urllib.parse import urlparse
 
 
 class PetDatabaseApi:
+    def _delete_local_uploaded_file(self, image_url: str | None):
+        if not image_url:
+            return
+
+        try:
+            parsed = urlparse(image_url)
+            image_path = Path(parsed.path.lstrip("/"))
+
+            # Chỉ cho phép xóa trong thư mục uploads để tránh xóa nhầm file hệ thống
+            if image_path.parts and image_path.parts[0] == "uploads" and image_path.exists():
+                image_path.unlink()
+        except Exception:
+            # Không làm fail request chỉ vì xóa file cũ thất bại
+            pass
+
     def __init__(self, current_user):
         db, token_data, _ = current_user
         self.db: Session = db
@@ -23,7 +40,7 @@ class PetDatabaseApi:
             else getattr(self.user, "role", None)
         )
 
-        query = self.db.query(models.Pet)
+        query = self.db.query(models.Pet).filter(models.Pet.is_deleted == False)
 
         # Chỉ thấy pet của mình nếu không phải admin
         if current_role != "admin" and current_uid is not None:
@@ -65,7 +82,7 @@ class PetDatabaseApi:
             else getattr(self.user, "role", None)
         )
 
-        query = self.db.query(models.Pet).filter(models.Pet.id == pet_id)
+        query = self.db.query(models.Pet).filter(models.Pet.id == pet_id, models.Pet.is_deleted == False)
         if current_role != "admin" and current_uid is not None:
             query = query.filter(models.Pet.user_id == current_uid)
         return query.first()
@@ -95,7 +112,7 @@ class PetDatabaseApi:
 
     def update_pet(self, data: PetUpdate):
 
-        pet = self.db.query(models.Pet).filter(models.Pet.id == data.id).first()
+        pet = self.db.query(models.Pet).filter(models.Pet.id == data.id, models.Pet.is_deleted == False).first()
         if not pet:
             return None
 
@@ -133,15 +150,17 @@ class PetDatabaseApi:
             pet.height = data.height
         if data.weight is not None:
             pet.weight = data.weight
-        if data.image is not None:
+        if data.image is not None and data.image != pet.image:
+            old_image = pet.image
             pet.image = data.image
+            self._delete_local_uploaded_file(old_image)
 
         self.db.commit()
         self.db.refresh(pet)
         return pet
 
     def delete_pet(self, pet_id: int):
-        pet = self.db.query(models.Pet).filter(models.Pet.id == pet_id).first()
+        pet = self.db.query(models.Pet).filter(models.Pet.id == pet_id, models.Pet.is_deleted == False).first()
         if not pet:
             return None
 
@@ -165,6 +184,7 @@ class PetDatabaseApi:
                 status_code=403, detail="Not authorized to delete this pet"
             )
 
-        self.db.delete(pet)
+        pet.is_deleted = True
         self.db.commit()
+
         return pet
