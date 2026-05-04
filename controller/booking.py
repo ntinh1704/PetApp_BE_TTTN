@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from crud import booking_crud
 from db.database import get_db
-from schemas.booking_schema import BookingCreate, BookingUpdate
+from schemas.booking_schema import BookingCreate, BookingUpdate, BookingAddService
 from setting.utils import (
     get_offset_limit,
     get_pages_records,
@@ -56,3 +56,13 @@ def delete_booking(booking_id: int, current_user=Depends(get_current_user)):
     if not deleted:
         raise HTTPException(status_code=404, detail="Booking not found")
     return {"detail": "Booking deleted successfully"}
+
+
+def add_service_to_booking(data: BookingAddService, current_user=Depends(get_current_user)):
+    db_api = booking_crud.BookingDatabaseApi(current_user)
+    return db_api.add_service_to_booking(data)
+
+
+def get_staff_availability(booking_date: str, booking_time: str, booking_end_time: str, current_user=Depends(get_current_user)):
+    db_api = booking_crud.BookingDatabaseApi(current_user)
+    return db_api.get_staff_availability(booking_date, booking_time, booking_end_time)

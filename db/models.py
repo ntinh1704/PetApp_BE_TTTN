@@ -62,6 +62,20 @@ class User(Base):
         ).decode("utf-8")
 
 
+class Staff(Base):
+    __tablename__ = "staff"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String(255), nullable=False)
+    phone = Column(String(255), nullable=True)
+    avatar = Column(String(255), nullable=True)
+    specialty = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, server_default=func.now())
+
+    bookings = relationship("Booking", back_populates="staff")
+
+
 class Pet(Base):
     __tablename__ = "pet"
 
@@ -93,6 +107,7 @@ class Service(Base):
     icon = Column(String(255), nullable=True)
     price = Column(DECIMAL(10, 2), nullable=True)
     duration = Column(Integer, nullable=True)
+    is_quantifiable = Column(Boolean, default=False)
     created_at = Column(DateTime, server_default=func.now())
 
     booking_services = relationship(
@@ -112,6 +127,7 @@ class Booking(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     pet_id = Column(Integer, ForeignKey("pet.id", ondelete="CASCADE"), nullable=False)
+    staff_id = Column(Integer, ForeignKey("staff.id", ondelete="SET NULL"), nullable=True)
     booking_date = Column(Date, nullable=True)
     booking_time = Column(Time, nullable=True)
     booking_end_time = Column(Time, nullable=True)
@@ -124,6 +140,7 @@ class Booking(Base):
 
     user = relationship("User", back_populates="bookings")
     pet = relationship("Pet", back_populates="bookings")
+    staff = relationship("Staff", back_populates="bookings")
     services = relationship(
         "BookingService", back_populates="booking", cascade="all, delete-orphan"
     )
@@ -140,6 +157,8 @@ class BookingService(Base):
         Integer, ForeignKey("service.id", ondelete="CASCADE"), nullable=False
     )
     price = Column(DECIMAL(10, 2), nullable=True)
+    quantity = Column(Integer, default=1)
+    is_addon = Column(Boolean, default=False)
 
     booking = relationship("Booking", back_populates="services")
     service = relationship("Service", back_populates="booking_services")

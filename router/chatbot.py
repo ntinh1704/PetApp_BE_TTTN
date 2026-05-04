@@ -97,6 +97,7 @@ def init_rag():
                 "Quy định chung:\n"
                 "- Giờ làm việc: 6:00 sáng - 10:00 tối (22:00) hàng ngày.\n"
                 "- Tất cả dịch vụ có giá niêm yết cố định (không phân biệt cân nặng/giới tính).\n"
+                "- Khi khách hàng cần tư vấn dịch vụ, BẮT BUỘC chỉ chọn và gợi ý TỐI ĐA 3 DỊCH VỤ phù hợp nhất có trong ngữ cảnh.\n"
                 "- Nếu thông tin không có trong ngữ cảnh, hãy từ chối lịch sự và khuyên liên hệ trực tiếp phòng khám qua số điện thoại 0909090909.\n\n"
                 "Thông tin phòng khám & Kiến thức (Ngữ cảnh):\n{context}\n\n"
                 "Khách hàng: {input}\n"
@@ -177,7 +178,7 @@ def _get_smart_recommendations(
         f"Dựa trên tin nhắn của khách hàng: '{message}'\n"
         f"Và câu trả lời của AI: '{ai_answer}'\n"
         f"Cùng thông tin thú cưng của khách hàng: {pets_info}\n"
-        f"Hãy chọn tối đa 3 dịch vụ phù hợp nhất từ danh sách sau:\n{services_info}\n\n"
+        f"Hãy chọn CHÍNH XÁC các dịch vụ được nhắc đến trong câu trả lời của AI từ danh sách sau (tối đa 3 dịch vụ):\n{services_info}\n\n"
         "Chỉ trả về danh sách các ID dịch vụ (ví dụ: [1, 2, 3]), nếu không có dịch vụ nào phù hợp hãy trả về []"
     )
 

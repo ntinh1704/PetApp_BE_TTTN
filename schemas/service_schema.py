@@ -10,6 +10,7 @@ class ServiceBase(BaseModel):
     icon: Optional[str] = None
     price: Optional[float] = None
     duration: Optional[int] = None
+    is_quantifiable: Optional[bool] = False
     images: Optional[List[str]] = None
     created_at: Optional[datetime] = None
 
@@ -30,6 +31,7 @@ class ServiceCreate(BaseModel):
     icon: Optional[str] = None
     price: Optional[float] = None
     duration: Optional[int] = None
+    is_quantifiable: Optional[bool] = False
     images: Optional[List[str]] = None
 
 
@@ -40,4 +42,5 @@ class ServiceUpdate(BaseModel):
     icon: Optional[str] = None
     price: Optional[float] = None
     duration: Optional[int] = None
+    is_quantifiable: Optional[bool] = False
     images: Optional[List[str]] = None

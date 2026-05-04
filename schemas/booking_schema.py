@@ -25,6 +25,7 @@ class BookingBase(BaseModel):
 class BookingCreate(BaseModel):
     pet_id: int
     service_ids: List[int]
+    staff_id: Optional[int] = None
     booking_date: Optional[date] = None
     booking_time: Optional[time] = None
     status: Optional[str] = None
@@ -37,6 +38,7 @@ class BookingCreate(BaseModel):
 class BookingUpdate(BaseModel):
     id: int
     service_ids: Optional[List[int]] = None
+    staff_id: Optional[int] = None
     booking_date: Optional[date] = None
     booking_time: Optional[time] = None
     status: Optional[str] = None
@@ -44,3 +46,10 @@ class BookingUpdate(BaseModel):
     cancel_reason: Optional[str] = None
     total_price: Optional[float] = None
     payment_method: Optional[str] = None
+
+
+class BookingAddService(BaseModel):
+    """Admin thêm dịch vụ phát sinh vào booking đang phục vụ"""
+    booking_id: int
+    service_id: int
+    quantity: int = 1

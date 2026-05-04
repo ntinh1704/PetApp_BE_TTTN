@@ -1,10 +1,14 @@
 Phòng khám thú y Coco Pet cung cấp các dịch vụ chuyên nghiệp dành cho chó mèo:
-1. Tư vấn sức khỏe tổng quát. Giá niêm yết: 100,000 VNĐ.
-2. Tiêm phòng vắc xin 7 bệnh cho chó. Giá niêm yết: 250,000 VNĐ/mũi.
-3. Tiêm phòng vắc xin Dại (Rabies). Giá niêm yết: 50,000 VNĐ/mũi.
-4. Dịch vụ Spa tắm và cắt tỉa lông chuyên nghiệp. Giá niêm yết: 200,000 VNĐ (áp dụng chung tất cả kích cỡ).
-5. Triệt sản mèo (đực/cái). Giá niêm yết: 350,000 VNĐ.
-6. Triệt sản chó (đực/cái). Giá niêm yết: 600,000 VNĐ.
+1. Thú y. Giá niêm yết: 200,000 VNĐ.
+2. Tiêm phòng. Giá niêm yết: 250,000 VNĐ.
+3. Triệt sản. Giá niêm yết: 1,500,000 VNĐ.
+4. Tắm & vệ sinh. Giá niêm yết: 80,000 VNĐ.
+5. Cắt tỉa – Spa. Giá niêm yết: 150,000 VNĐ.
+6. Tư vấn dinh dưỡng. Giá niêm yết: 150,000 VNĐ.
+7. Khách sạn thú cưng. Giá niêm yết: 300,000 VNĐ.
+8. Trông giữ thú cưng. Giá niêm yết: 100,000 VNĐ.
+9. Cấp cứu 24/7. Giá niêm yết: 500,000 VNĐ.
+10. Huấn luyện. Giá niêm yết: 500,000 VNĐ.
 
 Thời gian làm việc: Từ 6:00 sáng đến 10:00 tối (22:00) tất cả các ngày trong tuần (Thứ Hai đến Chủ Nhật).
 Khách hàng có thể đặt lịch trước thông qua ứng dụng Coco Pet để được ưu tiên phục vụ.

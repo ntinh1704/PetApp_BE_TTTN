@@ -32,6 +32,7 @@ class ServiceDatabaseApi:
                 "icon": s.icon,
                 "price": s.price,
                 "duration": s.duration,
+                "is_quantifiable": s.is_quantifiable,
                 "images": [img.image_url for img in (s.images or [])],
                 "created_at": s.created_at,
             }
@@ -57,6 +58,7 @@ class ServiceDatabaseApi:
             icon=data.icon,
             price=data.price,
             duration=data.duration,
+            is_quantifiable=data.is_quantifiable,
         )
 
         self.db.add(new_service)
@@ -93,6 +95,8 @@ class ServiceDatabaseApi:
             service.price = data.price
         if data.duration is not None:
             service.duration = data.duration
+        if data.is_quantifiable is not None:
+            service.is_quantifiable = data.is_quantifiable
 
         # Handle images update (max 5)
         if data.images is not None:

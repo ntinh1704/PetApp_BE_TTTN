@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from controller import booking
-from schemas.booking_schema import BookingBase, BookingCreate, BookingUpdate
+from schemas.booking_schema import BookingBase, BookingCreate, BookingUpdate, BookingAddService
 from setting.utils import get_current_user
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
@@ -13,6 +13,26 @@ def get_list_booking(
     # _current_user=Depends(get_current_user),
 ):
     return data
+
+
+@router.get("/staff-availability")
+def get_staff_availability(
+    booking_date: str,
+    booking_time: str,
+    booking_end_time: str,
+    _current_user=Depends(get_current_user),
+):
+    """Trạng thái nhân viên tại khung giờ (cho Admin phân công)"""
+    return booking.get_staff_availability(booking_date, booking_time, booking_end_time, _current_user)
+
+
+@router.post("/add-service")
+def add_service_to_booking(
+    data: BookingAddService,
+    _current_user=Depends(get_current_user),
+):
+    """Admin thêm dịch vụ phát sinh vào booking đang phục vụ"""
+    return booking.add_service_to_booking(data, _current_user)
 
 
 @router.get("/{booking_id}")

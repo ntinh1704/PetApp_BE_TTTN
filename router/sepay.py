@@ -8,9 +8,6 @@ router = APIRouter(prefix="/sepay", tags=["SePay"])
 
 @router.post("/webhook")
 async def sepay_webhook(request: Request, db: Session = Depends(get_db)):
-    """
-    Webhook endpoint to receive payment notifications from SePay.
-    """
     try:
         data = await request.json()
     except Exception:

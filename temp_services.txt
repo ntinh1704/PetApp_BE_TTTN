@@ -1,0 +1,31 @@
+3. Huấn luyện. Giá niêm yết: 500000 VNĐ.
+4. Khách sạn thú cưng. Giá niêm yết: 300000 VNĐ.
+6. Tắm & vệ sinh. Giá niêm yết: 80000 VNĐ.
+7. Chăm sóc sức khỏe. Giá niêm yết: 120000 VNĐ.
+9. Phối giống. Giá niêm yết: 1000000 VNĐ.
+10. Cấp cứu 24/7. Giá niêm yết: 500000 VNĐ.
+11. Tư vấn dinh dưỡng. Giá niêm yết: 150000 VNĐ.
+12. Cắt móng. Giá niêm yết: 50000 VNĐ.
+13. Vệ sinh tai. Giá niêm yết: 60000 VNĐ.
+14. Vệ sinh răng miệng. Giá niêm yết: 100000 VNĐ.
+16. Tẩy lông rụng. Giá niêm yết: 90000 VNĐ.
+17. Nhuộm lông nghệ thuật. Giá niêm yết: 200000 VNĐ.
+18. Taxi thú cưng. Giá niêm yết: 150000 VNĐ.
+19. Vận chuyển liên tỉnh. Giá niêm yết: 500000 VNĐ.
+23. Chăm sóc tại nhà. Giá niêm yết: 200000 VNĐ.
+24. Tắm tại nhà. Giá niêm yết: 150000 VNĐ.
+25. Xét nghiệm. Giá niêm yết: 400000 VNĐ.
+26. Tiêm phòng. Giá niêm yết: 250000 VNĐ.
+27. Triệt sản. Giá niêm yết: 1500000 VNĐ.
+29. Tổ chức sinh nhật. Giá niêm yết: 500000 VNĐ.
+30. Bảo hiểm thú cưng. Giá niêm yết: 100000 VNĐ.
+1. Thú y. Giá niêm yết: 200000 VNĐ.
+5. Trông giữ thú cưng. Giá niêm yết: 100000 VNĐ.
+8. Dắt thú cưng đi dạo. Giá niêm yết: 70000 VNĐ.
+15. Massage thú cưng. Giá niêm yết: 120000 VNĐ.
+20. Huấn luyện cơ bản. Giá niêm yết: 400000 VNĐ.
+21. Huấn luyện nâng cao. Giá niêm yết: 800000 VNĐ.
+22. Huấn luyện đi vệ sinh đúng chỗ. Giá niêm yết: 300000 VNĐ.
+28. Chụp ảnh thú cưng. Giá niêm yết: 300000 VNĐ.
+2. Cắt tỉa – Spa. Giá niêm yết: 150000 VNĐ.
+34. Chơi với thú cưng. Giá niêm yết: 10000 VNĐ.

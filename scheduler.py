@@ -7,10 +7,6 @@ from db.database import SessionLocal
 from db.models import Booking
 
 async def auto_cancel_unpaid_bookings():
-    """
-    Background task that runs periodically to cancel unpaid bookings
-    that have been pending for more than X minutes.
-    """
     CHECK_INTERVAL_SECONDS = 60 * 5  # Check every 5 minutes
     EXPIRATION_MINUTES = 15
     
@@ -36,10 +32,10 @@ async def auto_cancel_unpaid_bookings():
                 if expired_bookings:
                     for booking in expired_bookings:
                         booking.status = 'cancelled'
-                        booking.cancel_reason = f'Hệ thống đã tự động hủy do quá hạn thanh toán {EXPIRATION_MINUTES} phút'
+                        booking.cancel_reason = f'Lịch hẹn đã tự động hủy do quá hạn thanh toán {EXPIRATION_MINUTES} phút'
                     
                     db.commit()
-                    print(f"[Scheduler] Đã tự động hủy {len(expired_bookings)} lịch hẹn chưa thanh toán quá tạn.")
+                    print(f"[Scheduler] Đã tự động hủy {len(expired_bookings)} lịch hẹn chưa thanh toán quá hạn")
             except Exception as e:
                 db.rollback()
                 print(f"[Scheduler] Lỗi khi đang truy xuất cơ sở dữ liệu: {e}")

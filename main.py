@@ -6,7 +6,7 @@ import uuid
 
 from db import models
 from db.database import engine
-from router import user, pet, booking, service, notification, chatbot, sepay, cart
+from router import user, pet, booking, service, notification, chatbot, sepay, cart, staff
 from setting.config import settings
 
 from contextlib import asynccontextmanager
@@ -37,6 +37,7 @@ app.include_router(notification.router)
 app.include_router(chatbot.router)
 app.include_router(sepay.router)
 app.include_router(cart.router)
+app.include_router(staff.router)
 
 app.add_middleware(
     CORSMiddleware,
