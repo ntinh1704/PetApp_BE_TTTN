@@ -96,6 +96,8 @@ def init_rag():
                 "Sử dụng các thông tin ngữ cảnh sau đây để cung cấp lời khuyên chính xác, thân thiện.\n"
                 "Quy định chung:\n"
                 "- Giờ làm việc: 6:00 sáng - 10:00 tối (22:00) hàng ngày.\n"
+                "- CHỈ gợi ý dịch vụ nếu khách hàng có câu hỏi cụ thể về bệnh lý hoặc nhu cầu chăm sóc cần can thiệp chuyên môn.\n"
+                "- Nếu khách hàng chỉ chào hỏi, cảm ơn, hoặc nói chuyện phiếm, hãy giao tiếp ngắn gọn, lịch sự và TUYỆT ĐỐI KHÔNG nhắc đến tên dịch vụ cụ thể.\n"
                 "- Tất cả dịch vụ có giá niêm yết cố định (không phân biệt cân nặng/giới tính).\n"
                 "- Khi khách hàng cần tư vấn dịch vụ, BẮT BUỘC chỉ chọn và gợi ý TỐI ĐA 3 DỊCH VỤ phù hợp nhất có trong ngữ cảnh.\n"
                 "- Nếu thông tin không có trong ngữ cảnh, hãy từ chối lịch sự và khuyên liên hệ trực tiếp phòng khám qua số điện thoại 0909090909.\n\n"
@@ -174,12 +176,21 @@ def _get_smart_recommendations(
         else "Chưa đăng ký thú cưng"
     )
 
+    # Pre-check for chit-chat or generic thanks to avoid unnecessary LLM calls
+    lower_msg = message.lower().strip()
+    chit_chat_keywords = ["cảm ơn", "thank", "thanks", "cám ơn", "ok", "vâng", "dạ", "chào", "tạm biệt", "bye"]
+    if len(lower_msg.split()) <= 4 and any(kw in lower_msg for kw in chit_chat_keywords):
+        return []
+
     recommend_prompt = (
         f"Dựa trên tin nhắn của khách hàng: '{message}'\n"
         f"Và câu trả lời của AI: '{ai_answer}'\n"
         f"Cùng thông tin thú cưng của khách hàng: {pets_info}\n"
-        f"Hãy chọn CHÍNH XÁC các dịch vụ được nhắc đến trong câu trả lời của AI từ danh sách sau (tối đa 3 dịch vụ):\n{services_info}\n\n"
-        "Chỉ trả về danh sách các ID dịch vụ (ví dụ: [1, 2, 3]), nếu không có dịch vụ nào phù hợp hãy trả về []"
+        f"Hãy chọn CHÍNH XÁC các dịch vụ được nhắc đến hoặc cực kỳ cần thiết để giải quyết vấn đề của khách hàng từ danh sách sau (tối đa 3 dịch vụ):\n{services_info}\n\n"
+        "Quy tắc quan trọng:\n"
+        "1. Nếu tin nhắn là lời chào, lời cảm ơn hoặc nói chuyện phiếm, TRẢ VỀ [].\n"
+        "2. Chỉ gợi ý dịch vụ nếu AI đã tư vấn hoặc khách hàng có nhu cầu rõ ràng.\n"
+        "3. Trả về danh sách các ID dịch vụ dưới dạng JSON (ví dụ: [1, 2, 3]), nếu không có hãy trả về []."
     )
 
     try:
